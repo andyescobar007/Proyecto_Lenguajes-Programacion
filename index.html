@@ -1,186 +1,25 @@
 <!DOCTYPE html>
-
-
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <title>Sistema de Citas medicas</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>sistema_citas_medicas</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
     crossorigin="anonymous">
-  <link rel="stylesheet" href="https://unpkg.com/vue-toastr-2/dist/vue-toastr-2.min.css">
-</head>
-
-<body>
-
-
-  <div class="container">
-    <div class="row">
-      <div class="col-xs-12">
-        <h1 class="jumbotron" style="text-align: center">SISTEMA DE CITAS MEDICAS</h1>
-        <div id="app">
-          <table class="table table-stripped">
-            <thead>
-              <tr>
-                <th style="width:40px;"></th>
-                <th style="width:300px ;">NUMERO IDENTIDAD</th>
-                <th>PACIENTE</th>
-                <th style="width:150px;">FECHA</th>
-                <th style="width:200px;">DOCTOR</th>
-                <th style="width:100px;">¿Cancelado?
-                  <th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td></td>
-                <td>
-                  <input type="text" v-mask="'####-####-#####'" class="form-control" v-model="newEntry.n_identidad" />
-                </td>
-                <td>
-                  <input type="text" class="form-control" v-model="newEntry.paciente" />
-                </td>
-                <td>
-                  <input type="text" v-mask="'##-##-####'" class="form-control" v-model="newEntry.fecha" placeholder="dd-mm-yyyy" />
-                </td>
-                <td type="text-center">
-                  DR. HUESO
-                </td>
-                <td>
-                  <button @click="add()" type="button" class="btn btn-success btn-block">Agregar</button>
-        </div>
-
-        </tr>
-        <tr v-if="items.length == 0">
-          <td colspan="4" class="text-center">
-            No hay registros por mostrar
-          </td>
-        </tr>
-        <tr v-for="item, index in items">
-          <td>
-            <button @click="remove(index)" type="button" class="btn btn-danger btn-xs">
-              <i class="glyphicon glyphicon-trash"></i>
-            </button>
-          </td>
-          <td>{{ item.n_identidad }}</td>
-          <td>{{ item.paciente }}</td>
-          <td>{{ item.fecha}}</td>
-          <th>DR. HUESO</th>
-          <td class="text-center" :title="item.paid ? 'Si' : 'No'">
-            <button @click="changeToPaid(item)" class="btn btn-default btn-sm" :class="{ 'btn-success': item.paid  }">
-              <i v-if="item.paid" class="glyphicon glyphicon-ok"></i>
-              <i v-if="!item.paid" class="glyphicon glyphicon-remove"></i>
-            </button>
-          </td>
-        </tr>
-        </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/v-mask/dist/v-mask.min.js"></script>
-
-
-
-  <script>
-    Vue.use(VueMask.VueMaskPlugin);
-  </script>
-  <script src="https://unpkg.com/vue-toastr-2/dist/vue-toastr-2.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/4.10.1/firebase.js"></script>
-
-
-  <script>
-
-
-    ///FIREBASE 
-    var config = {
-      apiKey: "AIzaSyCDtLH2nqHR49q3a0eh8Y5BlJIOqIag4Es",
-      authDomain: "sistemadecitas-6308c.firebaseapp.com",
-      databaseURL: "https://sistemadecitas-6308c.firebaseio.com",
-      projectId: "sistemadecitas-6308c",
-      storageBucket: "sistemadecitas-6308c.appspot.com",
-      messagingSenderId: "713895614996"
-    };
-    firebase.initializeApp(config);
-    var db = firebase.database();
-
-    //CONECCION SERVE
-    //npm i -g serve
-    var app = new Vue({
-      el: '#app', // Elemento
-      ready: function () {
-        db.ref('citasmedicas/').on('value', function (snapshot) {
-          for (var propiedad in objeto) {
-            app.items.unshift({
-              '.key': propiedad,
-              n_identidad: objeto[propiedad].n_identidad,
-              paciente: objeto[propiedad].paciente,
-              fecha: objeto[propiedad].fecha,
-              paid: objeto[propiedad].paid
-            });
-          }
-        });
-      },
-      data: { // Parametros
-
-        newEntry: {
-          n_identidad: '',
-          paciente: '',
-          fecha: ''
-
-
-        },
-        items: [],
-      },
-      methods: {
-        remove: function (index) {
-          this.items.splice(index, 1);
-        },
-        // Ecmascript 6 syntax
-        add: function () {
-          if (this.newEntry.n_identidad.length > 14) {
-            if (this.newEntry.paciente.length > 0) {
-              if (this.newEntry.fecha.length > 9) {
-                db.ref('citasmedicas/').push({ n_identidad: this.newEntry.n_identidad, paciente: this.newEntry.paciente, fecha: this.newEntry.fecha, paid: false });
-                //this.items.push({ n_identidad: this.newEntry.n_identidad, paciente: this.newEntry.paciente, fecha: this.newEntry.fecha, paid: false });
-                this.newEntry.n_identidad = '';
-                this.newEntry.paciente = '';
-                this.newEntry.fecha = '';
-                this.$toastr.success('Cita Agregada');
-              } else {
-                this.$toastr.error('Ingrese una fecha valida');
-              }
-
-            } else {
-              this.$toastr.error('Porfavor ingrese un nombre al paciente');
-            }
-
-          } else {
-            this.$toastr.error('Numero de Identidad no valido');
-          }
+   
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/v-mask/dist/v-mask.min.js"></script>
 
 
 
 
-        },
-        changeToPaid: function (item) {
-          item.paid = !(item.paid);
-        },
-        totalAmount(t) {
-          var total = this.items.reduce(function (a, b) {
-            switch (t) {
-              case 0: return a + (!b.paid ? b.amount : 0);
-              case 1: return a + (b.paid ? b.amount : 0);
-              case 2: return a + b.amount;
-            }
-          }, 0);
-          return total.toFixed(2);
-        }
-      }
-    });
-  </script>
-</body>
+    <div id="app"></div>
+  
 
+    <!-- built files will be auto injected -->
+  </body>
 </html>
